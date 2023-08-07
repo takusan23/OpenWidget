@@ -44,10 +44,10 @@ class OpenWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
-        // データ取得
+        // よく使うアプリを取得する
         val usageStatusDataList = AppListManager.queryUsageAppDataList(context)
         val banditResult = BanditMachine.playAndResultAppList(usageStatusDataList, 15)
-        val widgetDataList = AppListManager.convertWidgetData(context, banditResult)
+        val widgetDataList = AppListManager.convertAppinfoData(context, banditResult)
 
         provideContent {
             Row(
@@ -90,7 +90,7 @@ class OpenWidget : GlanceAppWidget() {
                     gridCells = GridCells.Fixed(5)
                 ) {
 
-                    items(widgetDataList) { (label, icon, intent) ->
+                    items(widgetDataList) { (_, label, icon, intent) ->
                         Column(
                             modifier = GlanceModifier
                                 .padding(5.dp)

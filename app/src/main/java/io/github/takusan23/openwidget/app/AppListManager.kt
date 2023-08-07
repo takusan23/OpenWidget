@@ -3,6 +3,7 @@ package io.github.takusan23.openwidget.app
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -20,6 +21,27 @@ import java.util.Calendar
 
 /** アプリ一覧の取得など */
 object AppListManager {
+
+    /**
+     * インストール済みのアプリを取得する。ホームアプリのドロワーに表示されるアプリに限る。
+     *
+     * @param context [Context]
+     * @return [AppInfoData]の配列
+     */
+    suspend fun getAppListFromCategoryLauncher(context: Context): List<AppInfoData> = withContext(Dispatchers.Default) {
+        val packageManager = context.packageManager
+        val mainIntent = Intent(Intent.ACTION_MAIN, null)
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+        packageManager.queryIntentActivities(mainIntent, 0)
+            .map {
+                AppInfoData(
+                    packageName = it.activityInfo.packageName,
+                    label = it.loadLabel(packageManager).toString(),
+                    icon = createAppIconBitmap(context, it.loadIcon(packageManager)),
+                    intent = packageManager.getLaunchIntentForPackage(it.activityInfo.packageName)!!
+                )
+            }
+    }
 
     /**
      * アプリの使用状況を問い合わせる
@@ -62,12 +84,14 @@ object AppListManager {
      *
      * @param context [Context]
      * @param list [io.github.takusan23.openwidget.app.AppListManager.queryUsageAppDataList] 参照
+     * @return [AppInfoData]の配列
      */
-    suspend fun convertWidgetData(context: Context, list: List<UsageStatusData>): List<AppInfoData> {
+    suspend fun convertAppinfoData(context: Context, list: List<UsageStatusData>): List<AppInfoData> {
         val packageManager = context.packageManager
         val widgetData = list.map { usage ->
             val appInfo = getApplicationInfo(context, usage.packageName)
             AppInfoData(
+                packageName = appInfo.packageName,
                 label = appInfo.loadLabel(packageManager).toString(),
                 icon = createAppIconBitmap(context, appInfo.loadIcon(packageManager)),
                 intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)!!

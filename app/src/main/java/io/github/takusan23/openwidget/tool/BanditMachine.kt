@@ -13,6 +13,7 @@ object BanditMachine {
      * バンディットマシーンを回してアプリ一覧を返してもらう
      *
      * @param machineList アプリ一覧
+     * @param playCount 何回アームを回すか。返り値の配列のサイズになる
      * @return 起動しそうなアプリ
      */
     fun playAndResultAppList(machineList: List<UsageStatusData>, playCount: Int): List<UsageStatusData> {
