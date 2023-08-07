@@ -34,7 +34,7 @@ class OpenWidgetSearchActivityViewModel(application: Application) : AndroidViewM
             _appList.value = recommendAppInfoDataList()
             // インストール済みのアプリ
             installedAppList = AppListManager.getAppListFromCategoryLauncher(context)
-            // よく使うアプリを取得する。30件
+            // よく使うアプリを取得する
             usageStatusAppList = AppListManager.queryUsageAppDataList(context)
             recommendAppList = AppListManager.convertAppinfoData(context, usageStatusAppList)
         }

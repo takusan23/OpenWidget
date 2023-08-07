@@ -50,6 +50,7 @@ object AppListManager {
      * @param timeMachineDateCount 何日前まで遡って利用状況を問い合わせるか。負の値である必要があります。デフォルトで30日前。
      * @return [UsageStatusData]の配列
      */
+    // TODO この関数重いかも
     suspend fun queryUsageAppDataList(
         context: Context,
         timeMachineDateCount: Int = -30
