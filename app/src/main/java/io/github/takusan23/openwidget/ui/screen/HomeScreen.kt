@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.github.takusan23.openwidget.R
-import io.github.takusan23.openwidget.usage.UsageStatusTool
+import io.github.takusan23.openwidget.tool.UsageStatusTool
 
 /**
  * ホーム画面、権限リクエストなど
