@@ -62,7 +62,7 @@ fun HomeScreen() {
 
             if (isPermissionGranted.value) {
 
-                Text(text = "ホーム画面を長押ししてウィジェットを追加する")
+                Text(text = "ホーム画面を長押ししてウィジェットを追加してください...")
 
             } else {
 

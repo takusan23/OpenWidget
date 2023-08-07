@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.OpenWidget" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.TransparentActivity" parent="Theme.OpenWidget">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>

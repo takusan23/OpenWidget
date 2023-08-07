@@ -30,10 +30,10 @@ import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import io.github.takusan23.openwidget.MainActivity
+import io.github.takusan23.openwidget.OpenWidgetSearchActivity
 import io.github.takusan23.openwidget.R
+import io.github.takusan23.openwidget.app.AppListManager
 import io.github.takusan23.openwidget.tool.BanditMachine
-import io.github.takusan23.openwidget.usage.UsageStatusTool
 
 /**
  * Open Widget のレイアウトを Glance で書く
@@ -45,9 +45,9 @@ class OpenWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
         // データ取得
-        val usageStatusDataList = UsageStatusTool.queryUsageAppDataList(context)
+        val usageStatusDataList = AppListManager.queryUsageAppDataList(context)
         val banditResult = BanditMachine.playAndResultAppList(usageStatusDataList, 15)
-        val widgetDataList = OpenWidgetAppStatusProvider.convertWidgetData(context, banditResult)
+        val widgetDataList = AppListManager.convertWidgetData(context, banditResult)
 
         provideContent {
             Row(
@@ -63,7 +63,7 @@ class OpenWidget : GlanceAppWidget() {
                             .background(PrimaryButtonColor)
                             .padding(10.dp)
                             .cornerRadius(16.dp)
-                            .clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
+                            .clickable(actionStartActivity(Intent(context, OpenWidgetSearchActivity::class.java))),
                         provider = ImageProvider(R.drawable.outline_search_24),
                         contentDescription = null
                     )

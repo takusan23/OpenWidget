@@ -1,10 +1,11 @@
-package io.github.takusan23.openwidget.widget
+package io.github.takusan23.openwidget.app
 
+import android.app.usage.UsageStats
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration.UI_MODE_NIGHT_MASK
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
@@ -13,26 +14,60 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import io.github.takusan23.openwidget.usage.UsageStatusData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
-/**
- * ウィジェットのアプリ一覧で表示するデータを取得する
- */
-object OpenWidgetAppStatusProvider {
+/** アプリ一覧の取得など */
+object AppListManager {
 
     /**
-     * [UsageStatusData]の配列を、ウイジェット表示で使う[OpenWidgetAppStatusData]に変換する
+     * アプリの使用状況を問い合わせる
+     *
+     * @param context [context]
+     * @param timeMachineDateCount 何日前まで遡って利用状況を問い合わせるか。負の値である必要があります。デフォルトで30日前。
+     * @return [UsageStatusData]の配列
+     */
+    suspend fun queryUsageAppDataList(
+        context: Context,
+        timeMachineDateCount: Int = -30
+    ): List<UsageStatusData> = withContext(Dispatchers.IO) {
+        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val packageManager = context.packageManager
+        // 適当に一ヶ月前まで
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, timeMachineDateCount)
+        // クエリする
+        val statusDataList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, calendar.timeInMillis, System.currentTimeMillis())
+        // 同じアプリケーションIDの UsageStats が複数回含まれるため、一つにまとめて足す処理を書きます
+        val statusDataHashMap = hashMapOf<String, UsageStats>()
+        statusDataList.forEach { usageStats ->
+            statusDataHashMap[usageStats.packageName] = statusDataHashMap[usageStats.packageName]?.apply { add(usageStats) } ?: usageStats
+        }
+        // UI で扱いやすいようにして返す
+        val fixedStatusDataList = statusDataHashMap
+            .map { (packageName, usageStats) -> UsageStatusData(packageName, usageStats.totalTimeInForeground) }
+            // 一回も起動してないやつは除外
+            .filter { it.foregroundUsageTimeMs > 0 }
+            // 使う時間が長い順
+            .sortedByDescending { it.foregroundUsageTimeMs }
+        // ランチャーから起動できる Activity がないアプリ（システムアプリなど）は消す
+        // 起動可能な Intent を取得してみて、取れない場合は消す
+        // Package Visibility に従う必要あり
+        return@withContext fixedStatusDataList.filter<UsageStatusData> { packageManager.getLaunchIntentForPackage(it.packageName) != null }
+    }
+
+    /**
+     * [UsageStatusData]の配列を、[AppInfoData]に変換する
      *
      * @param context [Context]
-     * @param list [io.github.takusan23.openwidget.usage.UsageStatusTool.queryUsageAppDataList] 参照
+     * @param list [io.github.takusan23.openwidget.app.AppListManager.queryUsageAppDataList] 参照
      */
-    suspend fun convertWidgetData(context: Context, list: List<UsageStatusData>): List<OpenWidgetAppStatusData> {
+    suspend fun convertWidgetData(context: Context, list: List<UsageStatusData>): List<AppInfoData> {
         val packageManager = context.packageManager
         val widgetData = list.map { usage ->
             val appInfo = getApplicationInfo(context, usage.packageName)
-            OpenWidgetAppStatusData(
+            AppInfoData(
                 label = appInfo.loadLabel(packageManager).toString(),
                 icon = createAppIconBitmap(context, appInfo.loadIcon(packageManager)),
                 intent = packageManager.getLaunchIntentForPackage(appInfo.packageName)!!
@@ -84,10 +119,11 @@ object OpenWidgetAppStatusProvider {
      */
     @RequiresApi(Build.VERSION_CODES.S)
     private fun getThemeIconColorPair(context: Context): Pair<Int, Int> {
-        return if (context.resources.configuration.uiMode and UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES) {
+        return if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) {
             ContextCompat.getColor(context, android.R.color.system_neutral1_800) to ContextCompat.getColor(context, android.R.color.system_accent1_100)
         } else {
             ContextCompat.getColor(context, android.R.color.system_accent1_100) to ContextCompat.getColor(context, android.R.color.system_neutral2_700)
         }
     }
+
 }

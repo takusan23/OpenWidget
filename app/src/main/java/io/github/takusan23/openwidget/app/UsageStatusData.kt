@@ -1,4 +1,4 @@
-package io.github.takusan23.openwidget.usage
+package io.github.takusan23.openwidget.app
 
 /**
  * アプリの使用状況のデータクラス

@@ -1,6 +1,6 @@
 package io.github.takusan23.openwidget.tool
 
-import io.github.takusan23.openwidget.usage.UsageStatusData
+import io.github.takusan23.openwidget.app.UsageStatusData
 import kotlin.random.Random
 
 /** バンディットマシーンにアプリを選んでもらう */
