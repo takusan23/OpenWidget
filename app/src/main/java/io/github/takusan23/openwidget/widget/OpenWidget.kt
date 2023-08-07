@@ -1,6 +1,7 @@
 package io.github.takusan23.openwidget.widget
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -10,6 +11,7 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.GridCells
@@ -21,12 +23,14 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import io.github.takusan23.openwidget.MainActivity
 import io.github.takusan23.openwidget.R
 import io.github.takusan23.openwidget.tool.BanditMachine
 import io.github.takusan23.openwidget.usage.UsageStatusTool
@@ -53,14 +57,29 @@ class OpenWidget : GlanceAppWidget() {
                     .cornerRadius(16.dp),
             ) {
 
-                Image(
-                    modifier = GlanceModifier
-                        .background(SecondaryBackgroundColor)
-                        .padding(10.dp)
-                        .cornerRadius(16.dp),
-                    provider = ImageProvider(R.drawable.outline_search_24),
-                    contentDescription = null
-                )
+                Column(modifier = GlanceModifier.fillMaxHeight()) {
+                    Image(
+                        modifier = GlanceModifier
+                            .background(PrimaryButtonColor)
+                            .padding(10.dp)
+                            .cornerRadius(16.dp)
+                            .clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
+                        provider = ImageProvider(R.drawable.outline_search_24),
+                        contentDescription = null
+                    )
+
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+
+                    Image(
+                        modifier = GlanceModifier
+                            .background(SecondaryButtonColor)
+                            .padding(10.dp)
+                            .cornerRadius(16.dp)
+                            .clickable(actionRunCallback<OpenWidgetAppUpdateAction>()),
+                        provider = ImageProvider(R.drawable.outline_sync_24),
+                        contentDescription = null
+                    )
+                }
 
                 Spacer(modifier = GlanceModifier.size(5.dp))
 
@@ -71,7 +90,7 @@ class OpenWidget : GlanceAppWidget() {
                     gridCells = GridCells.Fixed(5)
                 ) {
 
-                    items(widgetDataList){(label, icon, intent) ->
+                    items(widgetDataList) { (label, icon, intent) ->
                         Column(
                             modifier = GlanceModifier
                                 .padding(5.dp)
@@ -107,7 +126,8 @@ class OpenWidget : GlanceAppWidget() {
         private val WidgetContent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) android.R.color.system_accent1_900 else android.R.color.darker_gray
         private val WidgetInnerContent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) android.R.color.system_accent2_100 else android.R.color.white
 
-        private val SecondaryBackgroundColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) android.R.color.system_accent1_500 else android.R.color.darker_gray
+        private val PrimaryButtonColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) android.R.color.system_accent1_500 else android.R.color.darker_gray
+        private val SecondaryButtonColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) android.R.color.system_accent2_500 else android.R.color.darker_gray
     }
 
 }
