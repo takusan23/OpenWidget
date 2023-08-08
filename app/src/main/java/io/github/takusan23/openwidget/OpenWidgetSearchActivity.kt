@@ -25,4 +25,10 @@ class OpenWidgetSearchActivity : ComponentActivity() {
         }
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        // アクティビティを離れたら消す
+        finishAndRemoveTask()
+    }
+
 }
