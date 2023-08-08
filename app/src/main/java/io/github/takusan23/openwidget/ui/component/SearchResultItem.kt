@@ -3,8 +3,11 @@ package io.github.takusan23.openwidget.ui.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +26,13 @@ import io.github.takusan23.openwidget.app.AppInfoData
 fun SearchResultItem(
     modifier: Modifier = Modifier,
     appInfoData: AppInfoData,
-    onClick: (AppInfoData) -> Unit
+    onClick: (AppInfoData) -> Unit,
+    color: Color = Color.Transparent
 ) {
     Surface(
         modifier = modifier,
         onClick = { onClick(appInfoData) },
-        color = Color.Transparent
+        color = color
     ) {
         Column {
             Row(
@@ -52,4 +56,43 @@ fun SearchResultItem(
             }
         }
     }
+}
+
+@Composable
+fun SearchResultItemHeader(
+    modifier: Modifier = Modifier,
+    color: Color = Color.Transparent
+) {
+    SearchResultItemHeaderFooter(
+        modifier = modifier,
+        color = color,
+        shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
+    )
+}
+
+@Composable
+fun SearchResultItemFooter(
+    modifier: Modifier = Modifier,
+    color: Color = Color.Transparent
+) {
+    SearchResultItemHeaderFooter(
+        modifier = modifier,
+        color = color,
+        shape = RoundedCornerShape(bottomStart = 25.dp, bottomEnd = 25.dp)
+    )
+}
+
+@Composable
+private fun SearchResultItemHeaderFooter(
+    modifier: Modifier = Modifier,
+    color: Color = Color.Transparent,
+    shape: RoundedCornerShape,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(25.dp),
+        shape = shape,
+        color = color,
+    ) {}
 }
