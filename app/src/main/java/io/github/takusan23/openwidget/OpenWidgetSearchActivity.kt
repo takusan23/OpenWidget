@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import io.github.takusan23.openwidget.ui.screen.OpenWidgetSearchScreen
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** Open Widget の検索を押したら出てくる Activity */
 class OpenWidgetSearchActivity : ComponentActivity() {
@@ -28,7 +31,11 @@ class OpenWidgetSearchActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         // アクティビティを離れたら消す
-        finishAndRemoveTask()
+        // すぐ消えるとあれなので遅延させる
+        MainScope().launch {
+            delay(500)
+            finishAndRemoveTask()
+        }
     }
 
 }
